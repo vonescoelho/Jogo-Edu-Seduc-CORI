@@ -190,6 +190,13 @@ table.ativ tr td:first-child{font-weight:700;border-left:5px solid var(--c,#0F7A
   padding:4px 10px;font-size:.56rem;opacity:.8;
   padding-bottom:max(4px, env(safe-area-inset-bottom))}
 @media print{ .selo{border-top:1px solid #999} }
+
+.jeito{border:2px solid var(--borda);border-radius:12px;padding:11px 14px;margin-bottom:9px;
+  background:var(--areia)}
+.jeito b{display:block;font-family:var(--disp);font-size:.95rem;margin-bottom:3px;color:var(--mar-fundo)}
+.jeito span{display:block;font-family:system-ui,sans-serif;font-size:.84rem;line-height:1.55;
+  color:var(--tinta-suave)}
+.jeito span b{display:inline;font-size:.86rem;color:var(--tinta)}
 </style>
 
 <div class="wrap">
@@ -213,6 +220,8 @@ table.ativ tr td:first-child{font-weight:700;border-left:5px solid var(--c,#0F7A
     <div class="linha" style="margin-top:16px">
       <button class="btn mar grande" id="bProfOk" disabled>Continuar ▸</button>
       <button class="btn" id="bConfig">⚙ Ajustes</button>
+      <button class="btn verde" id="bInstalar" style="display:none">📲 Instalar na tela inicial</button>
+      <button class="btn" id="bComoInstalar">❓ Como instalar</button>
     </div>
   </div>
 </section>
@@ -347,6 +356,43 @@ table.ativ tr td:first-child{font-weight:700;border-left:5px solid var(--c,#0F7A
 </section>
 
 <!-- ============ MODAIS ============ -->
+<div class="veu" id="veuInstalar">
+  <div class="modal" style="max-width:520px">
+    <h3>Colocar o aplicativo na tela do tablet</h3>
+    <p>Se o Chrome do seu aparelho não mostrar a opção de instalar, use um dos caminhos abaixo.
+       Todos funcionam — o aplicativo é o mesmo.</p>
+
+    <div class="jeito">
+      <b>1 · Chrome (Android)</b>
+      <span>Toque nos três pontinhos <b>⋮</b> no canto de cima → <b>Instalar aplicativo</b> ou
+      <b>Adicionar à tela inicial</b>. Se não aparecer, recarregue a página uma vez e tente de novo.</span>
+    </div>
+
+    <div class="jeito">
+      <b>2 · Tablet sem essa opção (Multilaser, Positivo e parecidos)</b>
+      <span>Esses aparelhos costumam vir com um Chrome antigo, que não instala aplicativos.
+      Nesse caso use o <b>arquivo</b>: copie o <b>aee-padre-coriolano.html</b> para o tablet
+      (cabo USB, cartão de memória, Drive ou WhatsApp), abra a pasta <b>Downloads</b> e toque nele.
+      Abre do mesmo jeito, com os sete jogos, e <b>não precisa de internet nenhuma</b>.</span>
+    </div>
+
+    <div class="jeito">
+      <b>3 · Firefox</b>
+      <span>Instale o Firefox pela Play Store, abra o endereço nele e toque em
+      <b>⋮ → Adicionar à tela inicial</b>. Ele consegue mesmo em aparelhos antigos.</span>
+    </div>
+
+    <div class="jeito">
+      <b>4 · iPhone e iPad</b>
+      <span>Precisa ser no <b>Safari</b>: botão <b>Compartilhar</b> → <b>Adicionar à Tela de Início</b>.</span>
+    </div>
+
+    <div class="linha" style="justify-content:flex-end;margin-top:16px">
+      <button class="btn mar grande" id="bFecharInstalar">Entendi</button>
+    </div>
+  </div>
+</div>
+
 <div class="veu" id="veuStop">
   <div class="modal">
     <h3>Encerrar antes do tempo</h3>
@@ -518,8 +564,12 @@ let sessoes=[];
 function carregar(){
   try{ const d=JSON.parse(localStorage.getItem("aee_cfg")||"null"); if(d) cfg=Object.assign(cfg,d); }catch(e){}
   try{ sessoes=JSON.parse(localStorage.getItem("aee_sessoes")||"[]"); }catch(e){}
-  if(!cfg.turmas.length) cfg.turmas=["1º ANO A","1º ANO B","2º ANO A","2º ANO B","3º ANO A","3º ANO B"];
-  if(!cfg.professores.length) cfg.professores=["Cícera","Vones Santos","Fábio","Siunaria","Navila","Carol"];
+  if(!cfg.turmas.length){
+    cfg.turmas=[];
+    "ABCD".split("").forEach(l=>cfg.turmas.push("1º ANO "+l));
+    "ABCDEFGHI".split("").forEach(l=>cfg.turmas.push("2º ANO "+l));
+    "ABCDEFGHI".split("").forEach(l=>cfg.turmas.push("3º ANO "+l));
+  }
 }
 function salvar(){
   try{ localStorage.setItem("aee_cfg",JSON.stringify(cfg));
@@ -613,14 +663,48 @@ $("#bNovoAlunoOk").onclick=()=>{
 
 /* ================= 3 · sessão ================= */
 let sessao=null, tCrono=null, jogoAberto=-1, entrouEm=0;
-function iniciarSessao(nome,turma){
-  sessao={orientador:profEscolhido, estudante:nome, turma, inicio:Date.now(), fim:null,
-          atividades:{}, ordem:[], encerradaAntes:false};
-  $("#mAluno").textContent=nome;
-  $("#mDados").textContent=turma+" · com "+profEscolhido;
+
+/* ---------- o atendimento fica guardado, para não se perder ----------
+   Se o estudante sair sem querer, fechar o aplicativo ou o tablet apagar a tela,
+   ao abrir de novo o atendimento continua do ponto onde estava. */
+const VALIDADE_SESSAO = 4*60*60*1000;      // 4 horas
+function guardarSessao(){
+  try{
+    if(sessao && !sessao.fim) localStorage.setItem("aee_em_curso", JSON.stringify(sessao));
+    else localStorage.removeItem("aee_em_curso");
+  }catch(e){}
+}
+function largarSessao(){ try{ localStorage.removeItem("aee_em_curso"); }catch(e){} }
+
+function montarSessao(){
+  $("#mAluno").textContent=sessao.estudante;
+  $("#mDados").textContent=sessao.turma+" · com "+sessao.orientador;
+  profEscolhido=sessao.orientador;
   pintarJogos(); tique();
   clearInterval(tCrono); tCrono=setInterval(tique,1000);
   mostrar("telaMenu");
+}
+function iniciarSessao(nome,turma){
+  sessao={orientador:profEscolhido, estudante:nome, turma, inicio:Date.now(), fim:null,
+          atividades:{}, ordem:[], encerradaAntes:false};
+  guardarSessao();
+  montarSessao();
+}
+function retomarSessao(){
+  let g=null;
+  try{ g=JSON.parse(localStorage.getItem("aee_em_curso")||"null"); }catch(e){}
+  if(!g || !g.estudante || g.fim) { largarSessao(); return false; }
+  if(Date.now()-g.inicio > VALIDADE_SESSAO){ largarSessao(); return false; }
+  sessao=g;
+  montarSessao();
+  avisoRetomada();
+  return true;
+}
+function avisoRetomada(){
+  const el=$("#avisoTempo");
+  if(!el) return;
+  el.textContent="Atendimento de "+sessao.estudante+" retomado de onde parou.";
+  setTimeout(()=>{ try{ tique(); }catch(e){} }, 6000);
 }
 function mmss(ms){const s=Math.max(0,Math.floor(ms/1000));
   return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");}
@@ -683,6 +767,7 @@ function acumulaTempo(){
     if(a) a.ms += Date.now()-entrouEm;
   }
   entrouEm=0;
+  guardarSessao();
 }
 /* Se o tablet apagar a tela ou o aplicativo for para segundo plano, o relógio
    daquela atividade para; volta a correr quando a tela acende de novo. */
@@ -709,6 +794,7 @@ addEventListener("message",ev=>{
   else if(d.ev==="erro") a.erros++;
   else if(d.ev==="dica"||d.ev==="revelou"||d.ev==="ajuda") a.ajudas++;
   else if(d.ev==="concluiu"||d.ev==="registro") a.detalhes.push(d.dados||{});
+  guardarSessao();
 });
 
 /* ---- encerrar ---- */
@@ -732,6 +818,7 @@ function encerrar(antes){
   if(jogoAberto>=0) fecharJogo();
   clearInterval(tCrono);
   sessao.fim=Date.now(); sessao.encerradaAntes=antes;
+  largarSessao();
   sessoes.unshift(JSON.parse(JSON.stringify(sessao)));
   salvar();
   pintarRelatorio(sessao);
@@ -834,8 +921,11 @@ $("#bCompartilhar").onclick=async()=>{
     const blob=gerarPdf(sessaoNoRel);
     const arq=new File([blob],nome,{type:"application/pdf"});
     if(navigator.canShare && navigator.canShare({files:[arq]})){
-      await navigator.share({files:[arq], title:"Relatório do AEE",
-        text:"Atendimento de "+sessaoNoRel.estudante+" — "+sessaoNoRel.turma});
+      // o título é o mesmo nome do arquivo: alguns aplicativos (o Drive, por exemplo)
+      // usam o título e não o nome do arquivo ao salvar
+      const titulo = nome.replace(/\.pdf$/i,"");
+      await navigator.share({files:[arq], title:titulo,
+        text:titulo+" · Atendimento do AEE · Orientador(a): "+sessaoNoRel.orientador});
       return;
     }
     baixar(blob,nome);
@@ -852,7 +942,7 @@ $("#bImprimir").onclick=()=>{
 };
 function aviso(txt){ const e=$("#erroPdf"); e.textContent=txt; e.classList.add("on");
   setTimeout(()=>e.classList.remove("on"),7000); }
-$("#bNovaSessao").onclick=()=>{ sessao=null; $("#buscaAluno").value=""; pintarAlunos(); mostrar("telaAluno"); };
+$("#bNovaSessao").onclick=()=>{ sessao=null; largarSessao(); $("#buscaAluno").value=""; pintarAlunos(); mostrar("telaAluno"); };
 
 /* ================= 5 · ajustes ================= */
 document.querySelectorAll("#abasCfg button").forEach(b=>b.onclick=()=>{
@@ -913,6 +1003,50 @@ $("#bLimparSessoes").onclick=()=>{
 $("#bFecharCfg").onclick=()=>{ pintarSugestoes(); mostrar("telaProf"); };
 
 /* ================= service worker ================= */
+/* ---------- instalar na tela inicial ---------- */
+let convite=null;
+addEventListener("beforeinstallprompt", e=>{
+  e.preventDefault(); convite=e;
+  $("#bInstalar").style.display="";          // só aparece quando dá mesmo para instalar
+});
+$("#bInstalar").onclick=async()=>{
+  if(!convite){ $("#veuInstalar").classList.add("on"); return; }
+  convite.prompt();
+  try{ await convite.userChoice; }catch(e){}
+  convite=null; $("#bInstalar").style.display="none";
+};
+addEventListener("appinstalled", ()=>{ $("#bInstalar").style.display="none"; convite=null; });
+$("#bComoInstalar").onclick=()=>$("#veuInstalar").classList.add("on");
+$("#bFecharInstalar").onclick=()=>$("#veuInstalar").classList.remove("on");
+// quando já está instalado ou aberto pelo arquivo, o botão de ajuda não faz falta
+if(matchMedia("(display-mode: standalone)").matches || navigator.standalone
+   || location.protocol==="file:"){
+  $("#bComoInstalar").style.display="none";
+}
+
+/* ---------- o botão Voltar não fecha o aplicativo ----------
+   No tablet, o botão Voltar fecharia o aplicativo de uma vez. Aqui ele passa a
+   fechar o jogo aberto e voltar ao menu; com um atendimento em curso, não sai. */
+try{ history.pushState({aee:1}, ""); }catch(e){}
+addEventListener("popstate", ()=>{
+  try{ history.pushState({aee:1}, ""); }catch(e){}
+  if($("#palco").classList.contains("on")){ fecharJogo(); return; }
+  if($("#veuInstalar").classList.contains("on")){ $("#veuInstalar").classList.remove("on"); return; }
+  if($("#veuStop").classList.contains("on")){ $("#veuStop").classList.remove("on"); return; }
+  if($("#veuNovoAluno") && $("#veuNovoAluno").classList.contains("on")){
+    $("#veuNovoAluno").classList.remove("on"); return; }
+  // com atendimento em curso o aplicativo fica onde está
+});
+
+/* ---------- não perder o atendimento ---------- */
+addEventListener("visibilitychange", ()=>{ if(document.hidden) guardarSessao(); });
+addEventListener("pagehide", guardarSessao);
+addEventListener("beforeunload", guardarSessao);
+setInterval(guardarSessao, 15000);        // rede de segurança
+
+// ao abrir, se havia um atendimento em curso, volta direto para ele
+retomarSessao();
+
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){
   addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 }
