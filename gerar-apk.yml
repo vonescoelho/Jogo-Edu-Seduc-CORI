@@ -1,0 +1,38 @@
+# Gera o APK do aplicativo do AEE automaticamente, de graça, nos servidores do GitHub.
+# Não precisa instalar nada no seu computador.
+#
+# Para rodar: no seu repositório, aba "Actions" -> "Gerar APK" -> "Run workflow".
+# Quando terminar, o APK aparece na própria página da execução, em "Artifacts".
+
+name: Gerar APK
+
+on:
+  workflow_dispatch:        # botão para você apertar quando quiser
+  push:
+    branches: [ main, master ]
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pegar os arquivos do projeto
+        uses: actions/checkout@v4
+
+      - name: Preparar o Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Preparar o Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Compilar o APK
+        run: gradle assembleDebug --no-daemon --stacktrace
+
+      - name: Guardar o APK para download
+        uses: actions/upload-artifact@v4
+        with:
+          name: aee-padre-coriolano-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error

@@ -1,0 +1,116 @@
+APLICATIVO DO AEE — ESCOLA DE ENSINO MÉDIO PADRE CORIOLANO
+Projeto para gerar o APK (arquivo de instalação do Android)
+
+===========================================================
+O QUE É ISTO
+===========================================================
+Esta pasta é o projeto pronto do aplicativo. Ela NÃO é o APK:
+é o "molde" a partir do qual o APK é gerado.
+
+Quem tiver o Android Studio instalado gera o APK em poucos
+minutos, sem precisar programar nada. As instruções estão
+abaixo, passo a passo.
+
+O aplicativo já está inteiro aqui dentro, em:
+    app/src/main/assets/index.html
+São as sete atividades, o brasão da escola e o relatório.
+Funciona sem internet nenhuma.
+
+===========================================================
+JEITO 1 (MAIS FÁCIL): PELO PRÓPRIO GITHUB, SEM INSTALAR NADA
+===========================================================
+Você já usa o GitHub. Ele compila o APK de graça para você,
+nos servidores dele. Não precisa baixar programa nenhum e
+serve em qualquer computador, até um fraquinho.
+
+1) Crie um repositório novo no GitHub (pode ser privado),
+   por exemplo: APK-AEE-Coriolano
+
+2) Envie TODO o conteúdo desta pasta para lá:
+   no site do repositório clique em
+       Add file  ->  Upload files
+   e arraste tudo o que está aqui dentro.
+   ATENÇÃO: a pasta .github precisa ir junto. Se o navegador
+   não deixar arrastar pasta oculta, use o GitHub Desktop, ou
+   crie o arquivo manualmente em:
+       Add file -> Create new file
+       nome:  .github/workflows/gerar-apk.yml
+       e cole o conteúdo do arquivo com esse nome que está aqui.
+
+3) No repositório, abra a aba  Actions  no topo.
+   Clique em  "Gerar APK"  na lista da esquerda e depois no
+   botão  "Run workflow".
+
+4) Espere de 3 a 6 minutos. Quando aparecer o visto verde,
+   clique na execução e role até o fim: em  "Artifacts"  está
+   o arquivo  aee-padre-coriolano-apk.  Baixe e descompacte:
+   dentro está o  app-debug.apk
+
+5) Passe esse .apk para o tablet e instale.
+
+===========================================================
+JEITO 2: ANDROID STUDIO (no seu computador)
+===========================================================
+1) Baixe o Android Studio (gratuito) em:
+   https://developer.android.com/studio
+
+2) Abra o Android Studio e escolha:
+      Open  ->  aponte para ESTA PASTA (projeto-aee)
+
+3) Espere a primeira abertura. Ele baixa sozinho o que falta
+   (isso pede internet e leva alguns minutos na primeira vez).
+
+4) No menu de cima:
+      Build  ->  Build Bundle(s) / APK(s)  ->  Build APK(s)
+
+5) Quando terminar aparece um aviso no canto com o link
+   "locate". O arquivo fica em:
+      app/build/outputs/apk/debug/app-debug.apk
+
+6) Passe esse .apk para o tablet (cabo USB, Drive, WhatsApp)
+   e toque nele para instalar.
+
+===========================================================
+NO TABLET, ANTES DE INSTALAR
+===========================================================
+O Android bloqueia instalação de fora da Play Store até você
+liberar. Vá em:
+      Configurações  ->  Aplicativos  ->  Acesso especial
+      ->  Instalar apps desconhecidos
+e libere para o app de onde você vai abrir o arquivo
+(Arquivos, Chrome ou Drive).
+
+Se o tablet for gerenciado pela Seduc, essa opção pode estar
+bloqueada pela escola. Nesse caso o caminho é abrir o arquivo
+aee-padre-coriolano.html direto no navegador, que funciona
+igual e não precisa instalar nada.
+
+===========================================================
+O QUE MUDA NO APK EM RELAÇÃO AO SITE
+===========================================================
+IGUAL:
+  - as sete atividades, todas completas
+  - cadastro de professores, turmas e estudantes
+  - o tempo mínimo de 10 minutos e o botão STOP
+  - o relatório em PDF, salvo na pasta Downloads
+  - funciona sem internet, sempre
+
+DIFERENTE:
+  - O reconhecimento de fala (o microfone que escuta o
+    estudante ler, no jogo "Fala Que Eu Escuto") NÃO funciona
+    dentro do APK: esse recurso existe só no navegador Chrome.
+    O jogo avisa na tela e continua servindo — o professor
+    ouve o estudante e marca o resultado à mão. O resto do
+    jogo, inclusive a voz que lê em voz alta, funciona normal.
+
+===========================================================
+FICHA TÉCNICA
+===========================================================
+  Nome do pacote : br.ce.padrecoriolano.aee
+  Nome na tela   : AEE Coriolano
+  Android mínimo : 5.0 (cobre o Multilaser M10 e mais antigos)
+  Sem bibliotecas de fora: usa só o que já vem no Android
+  Sem anúncios, sem coleta de dados, sem internet
+
+Os dados dos estudantes ficam guardados apenas no próprio
+tablet. Nada é enviado para lugar nenhum.
