@@ -1,4 +1,4 @@
-const CACHE = "aee-coriolano-v17";
+const CACHE = "aee-coriolano-v22";
 const ARQUIVOS = ["./","./index.html","./manifest.webmanifest","./icone-192.png","./icone-512.png","./icone-mascara-512.png"];
 self.addEventListener("install", e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ARQUIVOS)).then(()=>self.skipWaiting()));
