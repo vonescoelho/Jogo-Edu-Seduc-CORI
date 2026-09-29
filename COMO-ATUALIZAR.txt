@@ -1,0 +1,53 @@
+COMO ATUALIZAR O SITE NO GITHUB
+Versão do aplicativo: v48
+
+1. Abra o seu repositório no GitHub, na página principal dos arquivos.
+
+2. Clique em "Add file" e depois em "Upload files".
+
+3. Arraste para a página TODOS os arquivos desta pasta, menos este aqui:
+
+     index.html
+     manifest.webmanifest
+     sw.js
+     icone-192.png
+     icone-512.png
+     icone-mascara-512.png
+
+   Se o GitHub perguntar se quer substituir os arquivos que já existem, confirme:
+   é isso mesmo que deve acontecer.
+
+4. Desça a página, escreva em "Commit changes" uma frase curta, por exemplo:
+     atualiza o aplicativo do AEE
+   e clique no botão verde "Commit changes".
+
+5. Espere de um a dois minutos. O GitHub leva um tempinho para publicar.
+
+DEPOIS DE PUBLICAR, NOS TABLETES E CELULARES
+
+O aplicativo guarda a versão antiga para funcionar sem internet, por isso ele
+não troca sozinho na mesma hora. Para trazer a versão nova:
+
+  - Feche o aplicativo por completo (tire da lista de aplicativos abertos).
+  - Abra de novo, com internet ligada.
+  - Se ainda aparecer a versão antiga, feche e abra mais uma vez.
+
+Os dados guardados no aparelho não se perdem nessa troca: cadastro, fichas,
+atendimentos e a agenda continuam lá. Mesmo assim, antes de atualizar, vale
+fazer a cópia de segurança pela Área do professor.
+
+O QUE MUDOU NESTA VERSÃO
+
+  - Tela inicial com a agenda do dia, o próximo atendimento, os aniversários
+    dos estudantes e a próxima data comemorativa.
+  - Planejamento: folha para imprimir e material concreto sugeridos para cada
+    estudante do dia, com vinte atividades em quatro níveis.
+  - Roda do Sentir reorganizada, sem repetir emoção já respondida pelo mesmo
+    estudante, e com todos os ajustes num quadro só.
+  - Fichas com novos sinais de atenção para o ensino médio e com o campo de
+    direcionamento à equipe multidisciplinar e à rede de proteção.
+  - Cadastro do estudante com sexo e data de nascimento.
+  - Avaliação da sala de aula regular realizada na Sala de Recursos, como tipo
+    de horário, recurso do PAEE e frase do relatório.
+  - Relatório da sessão com mais detalhes e leitura do nível da atividade.
+  - Telas e documentos com visual mais sóbrio.
