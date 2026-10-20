@@ -1,39 +1,19 @@
 {
   "id": "./",
-  "name": "AEE — Escola de Ensino Médio Padre Coriolano",
-  "short_name": "AEE Coriolano",
-  "description": "Atividades da Sala de Recursos Multifuncionais da Escola Padre Coriolano.",
+  "name": "Atendimentos",
+  "short_name": "Atendimentos",
+  "description": "Plataforma de Atendimentos AEE: registro dos atendimentos, documentos pedagógicos e acompanhamento dos estudantes.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "display_override": [
-    "standalone",
-    "minimal-ui",
-    "browser"
-  ],
+  "display_override": ["standalone", "minimal-ui", "browser"],
   "orientation": "any",
   "background_color": "#FDF2DC",
   "theme_color": "#0F7A8C",
   "lang": "pt-BR",
   "dir": "ltr",
   "icons": [
-    {
-      "src": "icone-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icone-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icone-mascara-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
+    { "src": "logo-aee-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "logo-aee-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ]
 }
